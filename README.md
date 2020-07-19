@@ -51,6 +51,28 @@ For this challenge, we will write a Python script that performs all three ETL st
 
 <a name="chalsum"></a>
 ## Challenge Summary
+For the purpose of the challenge, we have performed etract, transformation and load similar to the way we did for the module. Refer to Challenge.ipynb and challenge.py for the codes and scripts. The codes have run without error. 
 
 <a name="assum"></a>
 ## Challenge Assumptions
+During the Merge process of Wiki's movie data and Kaggle's metadata, we had to make multiple decisions on how to resolve problems. We started by comparing columns that have similar data. For each pair of columns, we inspected data that is more consistent and has less outliers. It's best practice to document the data cleaning assumptions and decisions so that we can easily come back and change if necessary. 
+
+For titles columns, we inspected both columns and based on the output, the Kaggle's title column had more consistent values compared to Wiki's data, especially Kaggle data had no missing values. Therefore, we've decided to drop the Wikipedia's title_wiki column. 
+
+For the following columns, we inspected their scatter plot as it's a great way to inspect any outliers. The runtime, budget, and box office columns have shown that Kaggle data had less outliers but also had some missing values whereas those missing values have actual values in the Wiki data. We've decided to fill in those missing values with Wiki data. 
+
+For the release date, we've performed a line plot to examine any outliers. There was one data that had two different movies mreged into one. We've decided to drop the row and keep the Kaggle data. Once we inspected the null values in both columns, the Wiki data had 11 missing values whereas Kaggle data had none. We've decided to drop the Wikipedia's release_date_wiki column.
+
+For language columns, we've inspected that Kaggle column had the right data type whereas the Wiki data had mixture of lists. We've decided to drop the Wiki data.
+
+For production columns, Kaggle's data had more consistent structure so we decided to drop Wiki data. 
+
+In order to resolve the problems, we created a function to fill in any missing data with Wiki's data. 
+
+def fill_missing_kaggle_data(df, kaggle_column, wiki_column):
+    df[kaggle_column] = df.apply(
+        lambda row: row[wiki_column] if row[kaggle_column] == 0 else row[kaggle_column]
+        , axis=1)
+    df.drop(columns=wiki_column, inplace=True)
+
+For example, fill_missing_kaggle_data(movies_df, 'runtime', 'running_time') will return the wiki values if the kaggle value is equal to 0. 
